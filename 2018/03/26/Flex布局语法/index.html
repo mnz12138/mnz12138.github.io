@@ -108,8 +108,8 @@
 <meta property="og:description" content="布局的传统解决方案，基于盒状模型，依赖 display属性 + position属性 + float属性。它对于那些特殊布局非常不方便，比如，垂直居中就不容易实现。 2009年，W3C提出了一种新的方案—-Flex布局，可以简便、完整、响应式地实现各种页面布局。目前，它已经得到了所有浏览器的支持，这意味着，现在就能很安全地使用这项功能。 Flex布局将成为未来布局的首选方案。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/3791e575c48b3698be6a94ae1dbff79d.png">
-<meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/0cbe5f8268121114e87d0546e53cda6e.png">
-<meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/903d5b7df55779c03f2687a7d4d6bcea.png">
+<meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/0cbe5f8268121114e87d0546e53cda6e.png">
+<meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/903d5b7df55779c03f2687a7d4d6bcea.png">
 <meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/9da1f23965756568b4c6ea7124db7b9a.png">
 <meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/3c6b3c8b8fe5e26bca6fb57538cf72d9.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/fb4cf2bab8b6b744b64f6d7a99cd577c.jpg">
@@ -120,7 +120,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/f41c08bb35962ed79e7686f735d6cd78.png">
 <meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/240d3e960043a729bb3ff5e34987904f.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/03/26/Flex布局语法/flex/55b19171b8b6b9487d717bf2ecbba6de.png">
-<meta property="og:updated_time" content="2018-03-26T06:12:10.201Z">
+<meta property="og:updated_time" content="2018-03-28T05:46:02.757Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flex布局语法">
 <meta name="twitter:description" content="布局的传统解决方案，基于盒状模型，依赖 display属性 + position属性 + float属性。它对于那些特殊布局非常不方便，比如，垂直居中就不容易实现。 2009年，W3C提出了一种新的方案—-Flex布局，可以简便、完整、响应式地实现各种页面布局。目前，它已经得到了所有浏览器的支持，这意味着，现在就能很安全地使用这项功能。 Flex布局将成为未来布局的首选方案。">
@@ -422,11 +422,11 @@
 <h3 id="三、容器的属性"><a href="#三、容器的属性" class="headerlink" title="三、容器的属性"></a>三、容器的属性</h3><p>以下6个属性设置在容器上。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">flex-direction</span><br><span class="line">flex-wrap</span><br><span class="line">flex-flow</span><br><span class="line">justify-content</span><br><span class="line">align-items</span><br><span class="line">align-content</span><br></pre></td></tr></table></figure>
 <h4 id="3-1-flex-direction属性"><a href="#3-1-flex-direction属性" class="headerlink" title="3.1 flex-direction属性"></a>3.1 flex-direction属性</h4><p>flex-direction属性决定主轴的方向（即项目的排列方向）。</p>
-<p><img src="/2018/03/26/Flex布局语法/flex/0cbe5f8268121114e87d0546e53cda6e.png" alt="图片"></p>
+<p><img src="/2018/03/26/Flex布局语法/0cbe5f8268121114e87d0546e53cda6e.png" alt="图片"></p>
 <p>它可能有4个值。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">row（默认值）：主轴为水平方向，起点在左端。</span><br><span class="line">row-reverse：主轴为水平方向，起点在右端。</span><br><span class="line">column：主轴为垂直方向，起点在上沿。</span><br><span class="line">column-reverse：主轴为垂直方向，起点在下沿。</span><br></pre></td></tr></table></figure>
 <h4 id="3-2-flex-wrap属性"><a href="#3-2-flex-wrap属性" class="headerlink" title="3.2 flex-wrap属性"></a>3.2 flex-wrap属性</h4><p>默认情况下，项目都排在一条线（又称”轴线”）上。flex-wrap属性定义，如果一条轴线排不下，如何换行。</p>
-<p><img src="/2018/03/26/Flex布局语法/flex/903d5b7df55779c03f2687a7d4d6bcea.png" alt="图片"></p>
+<p><img src="/2018/03/26/Flex布局语法/903d5b7df55779c03f2687a7d4d6bcea.png" alt="图片"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.box&#123;</span><br><span class="line">  flex-wrap: nowrap | wrap | wrap-reverse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>它可能取三个值。</p>
 <p>（1）nowrap（默认）：不换行。</p>
