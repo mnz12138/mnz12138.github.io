@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一、URL Session的基本概念1. 三种工作模式： 默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。 瞬时会话模式（ephemeral）：该模式不使用磁盘保存任何数据。所有和会话相关的caches，证书，cookies等都被保存在RAM中，因此当程序使会话无效，这些缓存的数">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS原生网络请求">
+<meta property="og:url" content="http://yoursite.com/2018/03/24/iOS原生网络请求/index.html">
+<meta property="og:site_name" content="MNZ12138">
+<meta property="og:description" content="一、URL Session的基本概念1. 三种工作模式： 默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。 瞬时会话模式（ephemeral）：该模式不使用磁盘保存任何数据。所有和会话相关的caches，证书，cookies等都被保存在RAM中，因此当程序使会话无效，这些缓存的数">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-26T02:25:56.841Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS原生网络请求">
+<meta name="twitter:description" content="一、URL Session的基本概念1. 三种工作模式： 默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。 瞬时会话模式（ephemeral）：该模式不使用磁盘保存任何数据。所有和会话相关的caches，证书，cookies等都被保存在RAM中，因此当程序使会话无效，这些缓存的数">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="MNZ12138" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/24/iOS原生网络请求/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>iOS原生网络请求 | MNZ12138</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MNZ12138</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">iOS开发者，喜欢研究技术。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/iOS原生网络请求/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MNZ12138">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS原生网络请求</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-24T13:08:31+00:00">2018-03-24</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一、URL-Session的基本概念"><a href="#一、URL-Session的基本概念" class="headerlink" title="一、URL Session的基本概念"></a>一、URL Session的基本概念</h2><h3 id="1-三种工作模式："><a href="#1-三种工作模式：" class="headerlink" title="1. 三种工作模式："></a>1. 三种工作模式：</h3><ul>
+<li>默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。</li>
+<li>瞬时会话模式（ephemeral）：该模式不使用磁盘保存任何数据。所有和会话相关的caches，证书，cookies等都被保存在RAM中，因此当程序使会话无效，这些缓存的数据就会被自动清空。</li>
+<li>后台会话模式（background）：该模式在后台完成上传和下载，在创建Configuration对象的时候需要提供一个NSString类型的ID用于标识完成工作的后台会话。</li>
+</ul>
+<h3 id="2-NSURLSession支持的四种任务"><a href="#2-NSURLSession支持的四种任务" class="headerlink" title="2. NSURLSession支持的四种任务"></a>2. NSURLSession支持的四种任务</h3><p>NSURLSession类支持四种类型的任务：加载数据，下载和上传，建立一个TCP/IP连接。</p>
+<h2 id="二、相关的类"><a href="#二、相关的类" class="headerlink" title="二、相关的类"></a>二、相关的类</h2><h3 id="1-NSURLConnection和NSURLSession"><a href="#1-NSURLConnection和NSURLSession" class="headerlink" title="1. NSURLConnection和NSURLSession"></a>1. NSURLConnection和NSURLSession</h3><p>NSURLConnection这个名字，实际上指的是一组构成Foundation框架中URL加载系统的相互关联的组件：NSURLRequest，NSURLResponse，NSURLProtocol，NSURLCache，NSHTTPCookieStorage，NSURLCredentialStorage，以及和它同名的NSURLConnection。<br>在WWDC 2013中，Apple的团队对NSURLConnection进行了重构，并推出了NSURLSession作为替代。<br>NSURLSession也是一组相互依赖的类，它的大部分组件和NSURLConnection中的组件相同如NSURLRequest，NSURLCache等。而NSURLSession的不同之处在于，它将NSURLConnection替换为NSURLSession和NSURLSessionConfiguration，以及4个NSURLSessionTask的子类：NSURLSessionDataTask, NSURLSessionUploadTask, NSURLSessionDownloadTask，NSURLSessionStreamTask。</p>
+<p><strong>iOS为了适应不同的应用场景提供了不同类型的NSURLSessionTask</strong></p>
+<ul>
+<li>NSURLSessionTask : Task的抽象基类</li>
+<li>NSURLSessionDataTask  //一般的get、post等请求</li>
+<li>NSURLSessionUploadTask // 用于上传文件或者数据量比较大的请求</li>
+<li>NSURLSessionDownloadTask //用于下载文件或者数据量比较大的请求</li>
+<li>NSURLSessionStreamTask //建立一个TCP/IP连接的主机名和端口或一个网络服务对象。可以执行一个异步的读写</li>
+</ul>
+<h3 id="2-NSURLSessionConfiguration"><a href="#2-NSURLSessionConfiguration" class="headerlink" title="2. NSURLSessionConfiguration"></a>2. NSURLSessionConfiguration</h3><p>NSURLConnection是全局性的，即它的配置对全局有效，如果有两个链接需要不同的cookies、证书这些公共资源，则NSURLConnection无法满足要求，这时NSURLSession的优势则体现出来，NSURLSession可以同过NSURLSessionConfiguration可以设置全局的网络访问属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];</span><br><span class="line">// delegateQueue：请求完成回调函数和代理函数的运行线程，如果为nil则系统自动创建一个串行队列，不影响sessionTask的运行线程</span><br><span class="line">NSURLSession *session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];</span><br></pre></td></tr></table></figure>
+<h4 id="三种会话方式："><a href="#三种会话方式：" class="headerlink" title="三种会话方式："></a>三种会话方式：</h4><ol>
+<li>defaultSessionConfiguration：进程内会话（默认会话），类似 NSURLConnection的标准配置，用硬盘来缓存数据。</li>
+<li>ephemeralSessionConfiguration：临时的进程内会话（内存），不会将cookie、缓存储存到本地，只会放到内存中，当应用程序退出后数据也会消失,可以用于实现“秘密浏览”。</li>
+<li>backgroundSessionConfiguration：建立后台会话可以在应用程序挂起，退出，崩溃的情况下运行上传和下载任务，后台另起一个线程。另外，系统会根据设备的负载程度决定分配下载的资源，因此有可能会很慢甚至超时失败。</li>
+</ol>
+<h4 id="设置一些网络属性"><a href="#设置一些网络属性" class="headerlink" title="设置一些网络属性:"></a>设置一些网络属性:</h4><ul>
+<li>HTTPAdditionalHeaders：可以设置出站请求的数据头</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">configuration.HTTPAdditionalHeaders = @&#123; </span><br><span class="line">    @&quot;Accept&quot;: @&quot;application/json&quot;,</span><br><span class="line">    @&quot;Accept-Language&quot;: @&quot;en&quot;,</span><br><span class="line">    @&quot;Authorization&quot;: authString, </span><br><span class="line">    @&quot;User-Agent&quot;: userAgentString</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>networkServiceType，设置网络服务类型<ul>
+<li>NSURLNetworkServiceTypeDefault 默认</li>
+<li>NSURLNetworkServiceTypeVoIP VoIP</li>
+<li>NSURLNetworkServiceTypeVideo 视频</li>
+<li>NSURLNetworkServiceTypeBackground 后台</li>
+<li>NSURLNetworkServiceTypeVoice 语音</li>
+<li>NSURLNetworkServiceTypeCallSignaling 电话</li>
+</ul>
+</li>
+<li>allowsCellularAccess：允许蜂窝访问</li>
+<li>timeoutIntervalForRequest：请求的超时时长</li>
+<li>timeoutIntervalForResource：响应的超时时长</li>
+<li>requestCachePolicy：缓存策略</li>
+</ul>
+<blockquote>
+<p><strong>注意事项:如果是自定义会话并指定了代理，会话会对代理进行强引用,在视图控制器销毁之前，需要取消网络会话，否则会造成内存泄漏</strong></p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/22/Objective-C中的BOOL类型/" rel="next" title="Objective-C中的BOOL类型">
+                <i class="fa fa-chevron-left"></i> Objective-C中的BOOL类型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/26/Flex布局语法/" rel="prev" title="Flex布局语法">
+                Flex布局语法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Quanjin Wang</p>
+              <p class="site-description motion-element" itemprop="description">小码农</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/mnz12138" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、URL-Session的基本概念"><span class="nav-number">1.</span> <span class="nav-text">一、URL Session的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-三种工作模式："><span class="nav-number">1.1.</span> <span class="nav-text">1. 三种工作模式：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NSURLSession支持的四种任务"><span class="nav-number">1.2.</span> <span class="nav-text">2. NSURLSession支持的四种任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、相关的类"><span class="nav-number">2.</span> <span class="nav-text">二、相关的类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-NSURLConnection和NSURLSession"><span class="nav-number">2.1.</span> <span class="nav-text">1. NSURLConnection和NSURLSession</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NSURLSessionConfiguration"><span class="nav-number">2.2.</span> <span class="nav-text">2. NSURLSessionConfiguration</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#三种会话方式："><span class="nav-number">2.2.1.</span> <span class="nav-text">三种会话方式：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置一些网络属性"><span class="nav-number">2.2.2.</span> <span class="nav-text">设置一些网络属性:</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Quanjin Wang</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Pisces</a> v6.0.6</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
