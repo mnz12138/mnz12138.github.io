@@ -232,31 +232,6 @@
   </entry>
   
   <entry>
-    <title>URL转义</title>
-    <link href="http://yoursite.com/2018/03/22/URL%E8%BD%AC%E4%B9%89/"/>
-    <id>http://yoursite.com/2018/03/22/URL转义/</id>
-    <published>2018-03-22T02:30:31.000Z</published>
-    <updated>2018-03-31T10:27:51.403Z</updated>
-    
-    <content type="html"><![CDATA[<p>在使用<code>+URLWithString:</code>或<code>-initWithString:</code>来创建一个URL对象时，提供的参数字符串必须符合RFC 2396标准<a href="https://www.ietf.org/rfc/rfc2396.txt" target="_blank" rel="noopener">Uniform Resource Identifiers (URI): Generic Syntax</a>。而这两个方法又是根据RFC 1738 <a href="https://www.ietf.org/rfc/rfc1738.txt" target="_blank" rel="noopener">Uniform Resource Locators (URL)</a>和1808 <a href="https://www.ietf.org/rfc/rfc1808.txt" target="_blank" rel="noopener">Relative Uniform Resource Locators</a>两个标准来解析字符串的。故弄玄虚一下。当然我们不需要去了解所有的细节，简单了解一下就行，可以参考一下阮大侠的这篇关于URL编码。</p><p>这里要说明的就是：对于我们而言，如果用带有中文的字符串(如“<a href="https://www.baidu.com?q=北京" target="_blank" rel="noopener">https://www.baidu.com?q=北京</a>”)去创建一个URL对象的话，返回的是一个nil。</p><p>我们所需要做的就是对不符合标准的字符串进行转义操作。<code>NSString</code>类提供了两个方法来做这种转义操作，一个是<code>-stringByAddingPercentEscapesUsingEncoding:</code>，不过这个方法在iOS 9.0已被废弃；现在更提倡的是用<code>-stringByAddingPercentEncodingWithAllowedCharacters:</code>方法，这个方法是iOS 7.0后添加的。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NSString *urlStr = [@&quot;https://www.baidu.com?q=北京&quot; stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;在使用&lt;code&gt;+URLWithString:&lt;/code&gt;或&lt;code&gt;-initWithString:&lt;/code&gt;来创建一个URL对象时，提供的参数字符串必须符合RFC 2396标准&lt;a href=&quot;https://www.ietf.org/rfc/rfc2396.
-      
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="Objective-C" scheme="http://yoursite.com/tags/Objective-C/"/>
-    
-  </entry>
-  
-  <entry>
     <title>UIImageView显示gif图片有两种方式</title>
     <link href="http://yoursite.com/2018/03/22/UIImageView%E6%98%BE%E7%A4%BAgif%E5%9B%BE%E7%89%87%E6%9C%89%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F/"/>
     <id>http://yoursite.com/2018/03/22/UIImageView显示gif图片有两种方式/</id>
@@ -271,6 +246,31 @@
       
         &lt;p&gt;UIImageView显示gif图片有两种方式。当然前提都是先将gif中的每一帧取出来放到一个个UIImage对象中，将这些对象放到一个数组中，如下代码所示。&lt;/p&gt;
 &lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=
+      
+    
+    </summary>
+    
+      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
+    
+    
+      <category term="Objective-C" scheme="http://yoursite.com/tags/Objective-C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>URL转义</title>
+    <link href="http://yoursite.com/2018/03/22/URL%E8%BD%AC%E4%B9%89/"/>
+    <id>http://yoursite.com/2018/03/22/URL转义/</id>
+    <published>2018-03-22T02:30:31.000Z</published>
+    <updated>2018-03-31T10:27:51.403Z</updated>
+    
+    <content type="html"><![CDATA[<p>在使用<code>+URLWithString:</code>或<code>-initWithString:</code>来创建一个URL对象时，提供的参数字符串必须符合RFC 2396标准<a href="https://www.ietf.org/rfc/rfc2396.txt" target="_blank" rel="noopener">Uniform Resource Identifiers (URI): Generic Syntax</a>。而这两个方法又是根据RFC 1738 <a href="https://www.ietf.org/rfc/rfc1738.txt" target="_blank" rel="noopener">Uniform Resource Locators (URL)</a>和1808 <a href="https://www.ietf.org/rfc/rfc1808.txt" target="_blank" rel="noopener">Relative Uniform Resource Locators</a>两个标准来解析字符串的。故弄玄虚一下。当然我们不需要去了解所有的细节，简单了解一下就行，可以参考一下阮大侠的这篇关于URL编码。</p><p>这里要说明的就是：对于我们而言，如果用带有中文的字符串(如“<a href="https://www.baidu.com?q=北京" target="_blank" rel="noopener">https://www.baidu.com?q=北京</a>”)去创建一个URL对象的话，返回的是一个nil。</p><p>我们所需要做的就是对不符合标准的字符串进行转义操作。<code>NSString</code>类提供了两个方法来做这种转义操作，一个是<code>-stringByAddingPercentEscapesUsingEncoding:</code>，不过这个方法在iOS 9.0已被废弃；现在更提倡的是用<code>-stringByAddingPercentEncodingWithAllowedCharacters:</code>方法，这个方法是iOS 7.0后添加的。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NSString *urlStr = [@&quot;https://www.baidu.com?q=北京&quot; stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在使用&lt;code&gt;+URLWithString:&lt;/code&gt;或&lt;code&gt;-initWithString:&lt;/code&gt;来创建一个URL对象时，提供的参数字符串必须符合RFC 2396标准&lt;a href=&quot;https://www.ietf.org/rfc/rfc2396.
       
     
     </summary>
