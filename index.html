@@ -99,16 +99,16 @@
 
 
 
-  <meta name="description" content="小码农">
+  <meta name="description" content="小码农的博客">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MNZ12138">
 <meta property="og:url" content="http://yoursite.com/index.html">
 <meta property="og:site_name" content="MNZ12138">
-<meta property="og:description" content="小码农">
+<meta property="og:description" content="小码农的博客">
 <meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MNZ12138">
-<meta name="twitter:description" content="小码农">
+<meta name="twitter:description" content="小码农的博客">
 
 
 
@@ -307,7 +307,7 @@
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/04/深入理解KVO和KVC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -459,7 +459,7 @@
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/Swift可选值/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -606,7 +606,7 @@
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/Swift中enum、struct、class/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -817,7 +817,7 @@
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/Flex布局语法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -965,7 +965,7 @@
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/iOS原生网络请求/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -1150,7 +1150,7 @@
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/22/Objective-C中的BOOL类型/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -1293,10 +1293,154 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/22/URL转义/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MNZ12138">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/22/URL转义/" itemprop="url">URL转义</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-22T10:30:31+08:00">2018-03-22</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在使用<code>+URLWithString:</code>或<code>-initWithString:</code>来创建一个URL对象时，提供的参数字符串必须符合RFC 2396标准<a href="https://www.ietf.org/rfc/rfc2396.txt" target="_blank" rel="noopener">Uniform Resource Identifiers (URI): Generic Syntax</a>。而这两个方法又是根据RFC 1738 <a href="https://www.ietf.org/rfc/rfc1738.txt" target="_blank" rel="noopener">Uniform Resource Locators (URL)</a>和1808 <a href="https://www.ietf.org/rfc/rfc1808.txt" target="_blank" rel="noopener">Relative Uniform Resource Locators</a>两个标准来解析字符串的。故弄玄虚一下。当然我们不需要去了解所有的细节，简单了解一下就行，可以参考一下阮大侠的这篇关于URL编码。</p>
+<p>这里要说明的就是：对于我们而言，如果用带有中文的字符串(如“<a href="https://www.baidu.com?q=北京" target="_blank" rel="noopener">https://www.baidu.com?q=北京</a>”)去创建一个URL对象的话，返回的是一个nil。</p>
+<p>我们所需要做的就是对不符合标准的字符串进行转义操作。<code>NSString</code>类提供了两个方法来做这种转义操作，一个是<code>-stringByAddingPercentEscapesUsingEncoding:</code>，不过这个方法在iOS 9.0已被废弃；现在更提倡的是用<code>-stringByAddingPercentEncodingWithAllowedCharacters:</code>方法，这个方法是iOS 7.0后添加的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NSString *urlStr = [@&quot;https://www.baidu.com?q=北京&quot; stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/22/UIImageView显示gif图片有两种方式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -1439,154 +1583,10 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/22/URL转义/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MNZ12138">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/22/URL转义/" itemprop="url">URL转义</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-22T10:30:31+08:00">2018-03-22</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>在使用<code>+URLWithString:</code>或<code>-initWithString:</code>来创建一个URL对象时，提供的参数字符串必须符合RFC 2396标准<a href="https://www.ietf.org/rfc/rfc2396.txt" target="_blank" rel="noopener">Uniform Resource Identifiers (URI): Generic Syntax</a>。而这两个方法又是根据RFC 1738 <a href="https://www.ietf.org/rfc/rfc1738.txt" target="_blank" rel="noopener">Uniform Resource Locators (URL)</a>和1808 <a href="https://www.ietf.org/rfc/rfc1808.txt" target="_blank" rel="noopener">Relative Uniform Resource Locators</a>两个标准来解析字符串的。故弄玄虚一下。当然我们不需要去了解所有的细节，简单了解一下就行，可以参考一下阮大侠的这篇关于URL编码。</p>
-<p>这里要说明的就是：对于我们而言，如果用带有中文的字符串(如“<a href="https://www.baidu.com?q=北京" target="_blank" rel="noopener">https://www.baidu.com?q=北京</a>”)去创建一个URL对象的话，返回的是一个nil。</p>
-<p>我们所需要做的就是对不符合标准的字符串进行转义操作。<code>NSString</code>类提供了两个方法来做这种转义操作，一个是<code>-stringByAddingPercentEscapesUsingEncoding:</code>，不过这个方法在iOS 9.0已被废弃；现在更提倡的是用<code>-stringByAddingPercentEncodingWithAllowedCharacters:</code>方法，这个方法是iOS 7.0后添加的。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NSString *urlStr = [@&quot;https://www.baidu.com?q=北京&quot; stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/10/Runtime的几点用法总结/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -1738,7 +1738,7 @@
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/03/GCD/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Quanjin Wang">
+      <meta itemprop="name" content="Quanjin Wang - 上海">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -1908,8 +1908,8 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">Quanjin Wang</p>
-              <p class="site-description motion-element" itemprop="description">小码农</p>
+              <p class="site-author-name" itemprop="name">Quanjin Wang - 上海</p>
+              <p class="site-description motion-element" itemprop="description">小码农的博客</p>
           </div>
 
           
@@ -2021,7 +2021,7 @@
   <span class="with-love" id="animate"> 
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Quanjin Wang</span>
+  <span class="author" itemprop="copyrightHolder">Quanjin Wang - 上海</span>
 
   
 
