@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="KVOKVO，即key-value-observing,利用一个key来找到某个属性并监听其值得改变。其实这也是一种典型的观察者模式。简单的说，kvo的用法非常简单。  添加观察者 在观察者中实现监听方法，observeValueForKeyPath: ofObject: change: context:（通过查阅文档可以知道，绝大多数对象都有这个方法，因为这个方法属于NSObject） 移除观察">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解KVO和KVC">
+<meta property="og:url" content="http://yoursite.com/2018/04/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3KVO%E5%92%8CKVC/index.html">
+<meta property="og:site_name" content="Marks">
+<meta property="og:description" content="KVOKVO，即key-value-observing,利用一个key来找到某个属性并监听其值得改变。其实这也是一种典型的观察者模式。简单的说，kvo的用法非常简单。  添加观察者 在观察者中实现监听方法，observeValueForKeyPath: ofObject: change: context:（通过查阅文档可以知道，绝大多数对象都有这个方法，因为这个方法属于NSObject） 移除观察">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2018/04/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3KVO%E5%92%8CKVC/877100-146caa2385fe8d2a.png">
+<meta property="article:published_time" content="2018-04-03T19:22:44.000Z">
+<meta property="article:modified_time" content="2023-05-27T12:03:05.639Z">
+<meta property="article:author" content="Marks - 上海">
+<meta property="article:tag" content="Objective-C">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2018/04/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3KVO%E5%92%8CKVC/877100-146caa2385fe8d2a.png">
+
+<link rel="canonical" href="http://yoursite.com/2018/04/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3KVO%E5%92%8CKVC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>深入理解KVO和KVC | Marks</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Marks" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Marks</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">iOS开发者，喜欢研究技术。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3KVO%E5%92%8CKVC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Marks - 上海">
+      <meta itemprop="description" content="小码农的博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Marks">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          深入理解KVO和KVC
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-04-04 03:22:44" itemprop="dateCreated datePublished" datetime="2018-04-04T03:22:44+08:00">2018-04-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-27 20:03:05" itemprop="dateModified" datetime="2023-05-27T20:03:05+08:00">2023-05-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="KVO"><a href="#KVO" class="headerlink" title="KVO"></a>KVO</h3><p>KVO，即key-value-observing,利用一个key来找到某个属性并监听其值得改变。其实这也是一种典型的观察者模式。<br>简单的说，kvo的用法非常简单。</p>
+<ol>
+<li>添加观察者</li>
+<li>在观察者中实现监听方法，observeValueForKeyPath: ofObject: change: context:（通过查阅文档可以知道，绝大多数对象都有这个方法，因为这个方法属于NSObject）</li>
+<li>移除观察者</li>
+</ol>
+<p><strong>如果将一个对象设定成属性,这个属性是自动支持KVO的,如果这个对象是一个实例变量,那么,这个KVO是需要我们自己来实现的.</strong></p>
+<span id="more"></span>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//</span><br><span class="line">//  Student.h</span><br><span class="line">//  Test</span><br><span class="line">//</span><br><span class="line">//  Created by Apple on 2018/4/4.</span><br><span class="line">//  Copyright © 2018年 王全金. All rights reserved.</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line"></span><br><span class="line">@interface Student : NSObject &#123;</span><br><span class="line">    NSString *_country;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)setCountry:(NSString *)country;</span><br><span class="line">- (NSString *)country;</span><br><span class="line"></span><br><span class="line">@property (nonatomic, copy) NSString *name;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">//</span><br><span class="line">//  Student.m</span><br><span class="line">//  Test</span><br><span class="line">//</span><br><span class="line">//  Created by Apple on 2018/4/4.</span><br><span class="line">//  Copyright © 2018年 王全金. All rights reserved.</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">#import &quot;Student.h&quot;</span><br><span class="line"></span><br><span class="line">@implementation Student</span><br><span class="line"></span><br><span class="line">- (void)setCountry:(NSString *)country &#123;</span><br><span class="line">    [self willChangeValueForKey:@&quot;country&quot;];</span><br><span class="line">    _country = country;</span><br><span class="line">    [self didChangeValueForKey:@&quot;country&quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (NSString *)country &#123;</span><br><span class="line">    return _country;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//手动实现getter和setter</span><br><span class="line">@synthesize name = _name;</span><br><span class="line">- (void)setName:(NSString *)name &#123;</span><br><span class="line">    _name = name;</span><br><span class="line">&#125;</span><br><span class="line">- (NSString *)name &#123;</span><br><span class="line">    return _name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key &#123;</span><br><span class="line">    // 如果监测到键值为country,则指定为非自动监听对象</span><br><span class="line">    if ([key isEqualToString:@&quot;country&quot;]) &#123;</span><br><span class="line">        return NO;</span><br><span class="line">    &#125;</span><br><span class="line">    return [super automaticallyNotifiesObserversForKey:key];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">//</span><br><span class="line">//  ViewController.m</span><br><span class="line">//  Test</span><br><span class="line">//</span><br><span class="line">//  Created by Apple on 2018/3/28.</span><br><span class="line">//  Copyright © 2018年 王全金. All rights reserved.</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">#import &quot;ViewController.h&quot;</span><br><span class="line">#import &quot;Student.h&quot;</span><br><span class="line"></span><br><span class="line">@interface ViewController () </span><br><span class="line"></span><br><span class="line">@property (nonatomic, strong) Student *student;s</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation RootViewController</span><br><span class="line"></span><br><span class="line">- (void)viewDidLoad</span><br><span class="line">&#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line"></span><br><span class="line">    // 创建学生对象</span><br><span class="line">    _student = [Student new];</span><br><span class="line">    </span><br><span class="line">    // 监听属性name</span><br><span class="line">    [_student addObserver:self</span><br><span class="line">               forKeyPath:@&quot;name&quot;  // 属性</span><br><span class="line">                  options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld</span><br><span class="line">                  context:nil];</span><br><span class="line">    </span><br><span class="line">    // 监听实例变量age</span><br><span class="line">    [_student addObserver:self</span><br><span class="line">               forKeyPath:@&quot;country&quot;   // 实例变量</span><br><span class="line">                  options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld</span><br><span class="line">                  context:nil];</span><br><span class="line">    </span><br><span class="line">    _student.name = @&quot;Marks&quot;; // 改变名字</span><br><span class="line">    _student.country = @&quot;中国&quot;;      // 改变国家</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)observeValueForKeyPath:(NSString *)keyPath</span><br><span class="line">                      ofObject:(id)object</span><br><span class="line">                        change:(NSDictionary *)change</span><br><span class="line">                       context:(void *)context &#123;</span><br><span class="line">    NSLog(@&quot;%@&quot;, change);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)dealloc &#123;</span><br><span class="line">    [self removeObserver:_student forKeyPath:@&quot;name&quot;];</span><br><span class="line">    [self removeObserver:_student forKeyPath:@&quot;country&quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<h4 id="KVO的底层实现"><a href="#KVO的底层实现" class="headerlink" title="KVO的底层实现"></a>KVO的底层实现</h4><p>当一个类的属性被观察的时候，系统会通过runtime动态的创建一个该类的派生类，并且会在这个类中重写基类被观察的属性的setter方法，而且系统将这个类的isa指针指向了派生类，从而实现了给监听的属性赋值时调用的是派生类的setter方法。重写的setter方法会在调用原setter方法前后，通知观察对象值得改变。</p>
+<p><img src="/2018/04/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3KVO%E5%92%8CKVC/877100-146caa2385fe8d2a.png" alt="图片"></p>
+<blockquote>
+<p>facebook开源的工具，KVOController ，是一个简单安全的 KVO（Key-value Observing，键-值 观察）工具，好像挺好用的。</p>
+</blockquote>
+<h3 id="KVC"><a href="#KVC" class="headerlink" title="KVC"></a>KVC</h3><h4 id="KVC概述"><a href="#KVC概述" class="headerlink" title="KVC概述"></a>KVC概述</h4><p>KVC是Key Value Coding的简称。它是一种可以通过字符串的名字（key）来访问类属性的机制。而不是通过调用Setter、Getter方法访问。<br>关键方法定义在 NSKeyValueCodingProtocol<br>KVC支持类对象和内建基本数据类型。</p>
+<h4 id="KVC使用"><a href="#KVC使用" class="headerlink" title="KVC使用"></a>KVC使用</h4><ul>
+<li><p>获取值<br>  valueForKey: 传入NSString属性的名字。<br>  valueForKeyPath: 属性的路径，xx.xx<br>  valueForUndefinedKey 默认实现是抛出异常，可重写这个函数做错误处理</p>
+</li>
+<li><p>修改值<br>  setValue:forKey:<br>  setValue:forKeyPath:<br>  setValue:forUnderfinedKey:<br>  setNilValueForKey: 对非类对象属性设置nil时调用，默认抛出异常。</p>
+</li>
+</ul>
+<h4 id="KVC键值查找"><a href="#KVC键值查找" class="headerlink" title="KVC键值查找"></a>KVC键值查找</h4><p>搜索单值成员</p>
+<ul>
+<li><p>setValue:forKey:搜索方式  </p>
+<ol>
+<li>首先搜索setKey:方法。（key指成员变量名，首字母大写）  </li>
+<li>上面的setter方法没找到，如果类方法accessInstanceVariablesDirectly返回YES。那么按 _key，_isKey，key，iskey的顺序搜索成员名。（NSKeyValueCodingCatogery中实现的类方法，默认实现为返回YES）  </li>
+<li>如果没有找到成员变量，调用setValue:forUnderfinedKey:</li>
+</ol>
+</li>
+<li><p>valueForKey:的搜索方式  </p>
+<ol>
+<li>首先按getKey，key，isKey的顺序查找getter方法，找到直接调用。如果是BOOL、int等内建值类型，会做NSNumber的转换。  </li>
+<li>上面的getter没找到，查找countOfKey、objectInKeyAtindex、KeyAtindexes格式的方法。如果countOfKey和另外两个方法中的一个找到，那么就会返回一个可以响应NSArray所有方法的代理集合的NSArray消息方法。  </li>
+<li>还没找到，查找countOfKey、enumeratorOfKey、memberOfKey格式的方法。如果这三个方法都找到，那么就返回一个可以响应NSSet所有方法的代理集合。  </li>
+<li>还是没找到，如果类方法accessInstanceVariablesDirectly返回YES。那么按 _key，_isKey，key，iskey的顺序搜索成员名。  </li>
+<li>再没找到，调用valueForUndefinedKey。</li>
+</ol>
+</li>
+</ul>
+<h4 id="KVC实现分析"><a href="#KVC实现分析" class="headerlink" title="KVC实现分析"></a>KVC实现分析</h4><p>KVC运用了isa-swizzing技术。isa-swizzing就是类型混合指针机制。KVC通过isa-swizzing实现其内部查找定位。isa指针（is kind of 的意思）指向维护分发表的对象的类，该分发表实际上包含了指向实现类中的方法的指针和其他数据。</p>
+<p>比如说如下的一行KVC代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[site setValue:@&quot;sitename&quot; forKey:@&quot;name&quot;];</span><br><span class="line"></span><br><span class="line">//会被编译器处理成</span><br><span class="line">SEL sel = sel_get_uid(setValue:forKey);</span><br><span class="line">IMP method = objc_msg_loopup(site-&gt;isa,sel);</span><br><span class="line">method(site,sel,@&quot;sitename&quot;,@&quot;name&quot;);</span><br></pre></td></tr></table></figure>
+<p>每个类都有一张方法表，是一个hash表，值是还书指针IMP，SEL的名称就是查表时所用的键。<br>SEL数据类型：查找方法表时所用的键。定义成char*，实质上可以理解成int值。<br>IMP数据类型：他其实就是一个编译器内部实现时候的函数指针。当Objective-C编译器去处理实现一个方法的时候，就会指向一个IMP对象，这个对象是C语言表述的类型。</p>
+<h4 id="KVC的内部机制："><a href="#KVC的内部机制：" class="headerlink" title="KVC的内部机制："></a>KVC的内部机制：</h4><p>一个对象在调用setValue的时候进行了如下操作：</p>
+<ul>
+<li>根据方法名找到运行方法的时候需要的环境参数</li>
+<li>他会从自己的isa指针结合环境参数，找到具体的方法实现接口。</li>
+<li>再直接查找得来的具体的实现方法</li>
+</ul>
+<h4 id="KVC支持的聚合运算"><a href="#KVC支持的聚合运算" class="headerlink" title="KVC支持的聚合运算"></a>KVC支持的聚合运算</h4><ul>
+<li>sum 求和</li>
+<li>max 最大值</li>
+<li>min 最小值</li>
+<li>avg 平均值</li>
+<li>count 数量</li>
+</ul>
+<h5 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h5><p>新建一个类<code>Person</code>，里面存放一个属性<code>age</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line"></span><br><span class="line">@interface Person : NSObject</span><br><span class="line"></span><br><span class="line">/** 年龄 */</span><br><span class="line">@property (nonatomic, assign) NSUInteger age;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<p>创建一个数组，存放<code>Person</code>对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">NSMutableArray&lt;Person *&gt; *persons = [NSMutableArray array];</span><br><span class="line">for (int i = 1; i &lt;= 5; i++) &#123;</span><br><span class="line">    Person *p = [[Person alloc] init];</span><br><span class="line">    p.age = i;</span><br><span class="line">    [persons addObject:p];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用<code>@sum</code> <code>@min</code> <code>@max</code> <code>@avg</code> <code>@count</code>进行聚合运算</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">NSInteger sum = [[persons valueForKeyPath:@&quot;@sum.age&quot;] integerValue];</span><br><span class="line">NSInteger min = [[persons valueForKeyPath:@&quot;@min.age&quot;] integerValue];</span><br><span class="line">NSInteger max = [[persons valueForKeyPath:@&quot;@max.age&quot;] integerValue];</span><br><span class="line">float avg = [[persons valueForKeyPath:@&quot;@avg.age&quot;] floatValue];</span><br><span class="line">NSInteger count = [[persons valueForKeyPath:@&quot;@count.age&quot;] integerValue];</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;sum=%zd&quot;, sum);</span><br><span class="line">NSLog(@&quot;min=%zd&quot;, min);</span><br><span class="line">NSLog(@&quot;max=%zd&quot;, max);</span><br><span class="line">NSLog(@&quot;avg=%g&quot;, avg);</span><br><span class="line">NSLog(@&quot;count=%zd&quot;, count);</span><br></pre></td></tr></table></figure>
+<p>打印结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2018-04-04 13:42:50.099122+0800 Test[11815:158919] sum=15</span><br><span class="line">2018-04-04 13:42:50.099353+0800 Test[11815:158919] min=1</span><br><span class="line">2018-04-04 13:42:50.099506+0800 Test[11815:158919] max=5</span><br><span class="line">2018-04-04 13:42:50.099631+0800 Test[11815:158919] avg=3</span><br><span class="line">2018-04-04 13:42:50.099867+0800 Test[11815:158919] count=5</span><br></pre></td></tr></table></figure>
+
+
+<h5 id="数组中直接存放数值的情况"><a href="#数组中直接存放数值的情况" class="headerlink" title="数组中直接存放数值的情况"></a>数组中直接存放数值的情况</h5><p>直接使用<code>@运算符.floatValue</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NSArray&lt;NSNumber *&gt; *arr = @[@1, @2, @3, @4];</span><br><span class="line">NSNumber *avg = [arr valueForKeyPath:@&quot;@avg.floatValue&quot;];</span><br><span class="line">NSNumber *sum = [arr valueForKeyPath:@&quot;@sum.integerValue&quot;];</span><br><span class="line">NSLog(@&quot;avg=%@&quot;, avg);</span><br><span class="line">NSLog(@&quot;sum=%@&quot;, sum);</span><br></pre></td></tr></table></figure>
+<p>打印结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2018-04-04 13:47:56.108888+0800 Test[12017:162610] avg=2.5</span><br><span class="line">2018-04-04 13:47:56.109200+0800 Test[12017:162610] sum=10</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Objective-C/" rel="tag"># Objective-C</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/04/02/Swift%E5%8F%AF%E9%80%89%E5%80%BC/" rel="prev" title="Swift可选值">
+      <i class="fa fa-chevron-left"></i> Swift可选值
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#KVO"><span class="nav-number">1.</span> <span class="nav-text">KVO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#KVO%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.1.</span> <span class="nav-text">KVO的底层实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KVC"><span class="nav-number">2.</span> <span class="nav-text">KVC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#KVC%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">KVC概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KVC%E4%BD%BF%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">KVC使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KVC%E9%94%AE%E5%80%BC%E6%9F%A5%E6%89%BE"><span class="nav-number">2.3.</span> <span class="nav-text">KVC键值查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KVC%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90"><span class="nav-number">2.4.</span> <span class="nav-text">KVC实现分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KVC%E7%9A%84%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">KVC的内部机制：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KVC%E6%94%AF%E6%8C%81%E7%9A%84%E8%81%9A%E5%90%88%E8%BF%90%E7%AE%97"><span class="nav-number">2.6.</span> <span class="nav-text">KVC支持的聚合运算</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">2.6.1.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9B%B4%E6%8E%A5%E5%AD%98%E6%94%BE%E6%95%B0%E5%80%BC%E7%9A%84%E6%83%85%E5%86%B5"><span class="nav-number">2.6.2.</span> <span class="nav-text">数组中直接存放数值的情况</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Marks - 上海</p>
+  <div class="site-description" itemprop="description">小码农的博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Marks - 上海</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

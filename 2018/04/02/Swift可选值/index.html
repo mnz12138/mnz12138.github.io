@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="可选型optional ，表示一个值可能为空。但是这个空，在swift中就叫可选型，用关键字nil表示。它既不是0，也不是不存在，它就是nil 要么是它自身的值，要么为nil。nil就是可选型的默认值">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift可选值">
+<meta property="og:url" content="http://yoursite.com/2018/04/02/Swift%E5%8F%AF%E9%80%89%E5%80%BC/index.html">
+<meta property="og:site_name" content="Marks">
+<meta property="og:description" content="可选型optional ，表示一个值可能为空。但是这个空，在swift中就叫可选型，用关键字nil表示。它既不是0，也不是不存在，它就是nil 要么是它自身的值，要么为nil。nil就是可选型的默认值">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-04-01T23:07:13.000Z">
+<meta property="article:modified_time" content="2023-05-27T11:58:43.410Z">
+<meta property="article:author" content="Marks - 上海">
+<meta property="article:tag" content="Swift">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/04/02/Swift%E5%8F%AF%E9%80%89%E5%80%BC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Swift可选值 | Marks</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Marks" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Marks</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">iOS开发者，喜欢研究技术。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/Swift%E5%8F%AF%E9%80%89%E5%80%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Marks - 上海">
+      <meta itemprop="description" content="小码农的博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Marks">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Swift可选值
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-04-02 07:07:13" itemprop="dateCreated datePublished" datetime="2018-04-02T07:07:13+08:00">2018-04-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-27 19:58:43" itemprop="dateModified" datetime="2023-05-27T19:58:43+08:00">2023-05-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>可选型<code>optional</code> ，表示一个值可能为空。但是这个空，在swift中就叫可选型，用关键字<code>nil</code>表示。它既不是0，也不是不存在，它就是<code>nil</code></p>
+<p>要么是它自身的值，要么为<code>nil</code>。<code>nil</code>就是可选型的默认值</p>
+<span id="more"></span>
+
+<h3 id="声明一个可选项"><a href="#声明一个可选项" class="headerlink" title="声明一个可选项"></a>声明一个可选项</h3><p>用： 字符类型+? 必须显示的申明</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var errorCode:Int? = 404</span><br><span class="line">var errorMessage:String? = &quot;Not Found!&quot;</span><br><span class="line"></span><br><span class="line">errorCode = nil</span><br><span class="line"></span><br><span class="line">print( errorMessage )  // 输出：Optional(&quot;Not Found!&quot;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="不能隐示的声明"><a href="#不能隐示的声明" class="headerlink" title="不能隐示的声明"></a>不能隐示的声明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//var errorCode1? = 404 //报错，必须声明类型</span><br><span class="line"></span><br><span class="line">var errorCode2:Int? = 404 //得像这样，显示的申明一个类型</span><br><span class="line"></span><br><span class="line">// Int? 和 Int 不是一种类型</span><br><span class="line">let imInt = 405 //Int 型</span><br><span class="line">errorCode = imInt</span><br><span class="line">print(errorCode)  //Optional(405)</span><br><span class="line"></span><br><span class="line">//imInt = errorCode //报错了，把一个可选型赋值给一个Int型，报错。</span><br></pre></td></tr></table></figure>
+
+<h3 id="可选型的解包。"><a href="#可选型的解包。" class="headerlink" title="可选型的解包。"></a>可选型的解包。</h3><p>解包就是我得使用它了。确认强制解包用：!</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var errorCode3:String? = &quot;404&quot;</span><br><span class="line"></span><br><span class="line">//&quot;the errorcode is &quot; + errorCode3 // 报错:2种不同的类型不能直接拼装使用。</span><br><span class="line"></span><br><span class="line">//如果需要使用，就得解包。用强制解包：！</span><br><span class="line">&quot;the errorcode is &quot; + errorCode3! // 打印：the errorcode is 404</span><br><span class="line"></span><br><span class="line">//用强制解包，是很危险的，如果这个值真的为 nil。然后强制解包，就会报错。</span><br><span class="line"></span><br><span class="line">var errorCode4:String? = nil</span><br><span class="line">//&quot;the errorcode is &quot; + errorCode4! // 报错了：nil被强制解包报错。</span><br></pre></td></tr></table></figure>
+
+<h3 id="可以用if-判断可选型是否为nil，安全后再用-解包"><a href="#可以用if-判断可选型是否为nil，安全后再用-解包" class="headerlink" title="可以用if 判断可选型是否为nil，安全后再用!解包"></a>可以用if 判断可选型是否为nil，安全后再用!解包</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var errorCode5:String? = &quot;502&quot;</span><br><span class="line">if errorCode5 != nil &#123;</span><br><span class="line">    print(errorCode5!) //打印：502</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    print(&quot;No error!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="if-联合使用-let-关键字解包，可以不用-了"><a href="#if-联合使用-let-关键字解包，可以不用-了" class="headerlink" title="if 联合使用 let 关键字解包，可以不用!了"></a>if 联合使用 let 关键字解包，可以不用!了</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if let unwrappedErrorCode = errorCode5&#123;</span><br><span class="line">    print(unwrappedErrorCode) //打印：502</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    print(&quot;No error!&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//也可以用相同的名字：</span><br><span class="line">if let errorCode5 = errorCode5&#123;</span><br><span class="line">    print(errorCode5) //打印：502</span><br><span class="line">&#125; else&#123;</span><br><span class="line">    print(&quot;No error!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-if-let-解包多个可选型的值。相当于-and-操作"><a href="#使用-if-let-解包多个可选型的值。相当于-and-操作" class="headerlink" title="使用 if let 解包多个可选型的值。相当于 and 操作"></a>使用 if let 解包多个可选型的值。相当于 and 操作</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if let errorCode5 = errorCode5, errorMessage = errorMessage&#123;</span><br><span class="line">    print(&quot;code is \(errorCode5), msg is \(errorMessage)&quot;)</span><br><span class="line">    //打印：code is 502, msg is Not Found!</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-if-let-再加-where-进一步限定"><a href="#使用-if-let-再加-where-进一步限定" class="headerlink" title="使用 if let 再加 where 进一步限定"></a>使用 if let 再加 where 进一步限定</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if let errorCode5 = errorCode5, errorMessage = errorMessage where errorCode5 == &quot;502&quot;&#123;</span><br><span class="line">    print(&quot;code is \(errorCode5), msg is \(errorMessage)&quot;)</span><br><span class="line">&#125;</span><br><span class="line">print(errorCode5) // 它自身的值并没有被改变：Optional(&quot;502&quot;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-guard-let，可以不用-了"><a href="#使用-guard-let，可以不用-了" class="headerlink" title="使用 guard let，可以不用!了"></a>使用 guard let，可以不用!了</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let str: String? = &quot;&quot;</span><br><span class="line">guard let newStr = str else &#123;</span><br><span class="line">    print(&quot;str为nil&quot;)</span><br><span class="line">    //str为nil时，在这里会直接return</span><br><span class="line">    return</span><br><span class="line">&#125;</span><br><span class="line">//下面使用newStr不用解包，newStr为非可选类型</span><br><span class="line">print(newStr)</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-guard-let-解包多个可选型的值。相当于-and-操作"><a href="#使用-guard-let-解包多个可选型的值。相当于-and-操作" class="headerlink" title="使用 guard let 解包多个可选型的值。相当于 and 操作"></a>使用 guard let 解包多个可选型的值。相当于 and 操作</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let str1: String? = &quot;&quot;</span><br><span class="line">let str2: String? = &quot;&quot;</span><br><span class="line">guard let newStr1 = str1, let newStr2 = str2 else &#123;</span><br><span class="line">    print(&quot;str1或str2为nil&quot;)</span><br><span class="line">    return</span><br><span class="line">&#125;</span><br><span class="line">print(newStr1)</span><br><span class="line">print(newStr2)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Optional-chaining-链式操作"><a href="#Optional-chaining-链式操作" class="headerlink" title="Optional chaining 链式操作"></a>Optional chaining 链式操作</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">//解包</span><br><span class="line">var errorMessage2: String? = &quot;Not Found&quot;</span><br><span class="line">if let errorMessage2 = errorMessage2&#123;</span><br><span class="line">    print(errorMessage2.uppercaseString) // &quot;NOT FOUND&quot; 全部大写了</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//chaining操作就是可以直接用：</span><br><span class="line"></span><br><span class="line">if let errorMessage2 = errorMessage2?.uppercaseString&#123;</span><br><span class="line">    print(errorMessage2) // &quot;NOT FOUND&quot; 全部大写了</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//也可以直接用 ！强制解包，前提是你确定一定不为nil。</span><br><span class="line">let upperMessage2 = errorMessage2!.uppercaseString //&quot;NOT FOUND&quot; 全部大写了</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-解包。更加单的三目运算符"><a href="#使用-解包。更加单的三目运算符" class="headerlink" title="使用 ?? 解包。更加单的三目运算符"></a>使用 ?? 解包。更加单的三目运算符</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let message2 = errorMessage == nil ? &quot;No error&quot; : errorMessage!</span><br><span class="line"></span><br><span class="line">//等价。如果 errorMessage 解包成功，就把解包的值给 message3</span><br><span class="line">//如果 errorMessage 解包失败，message3的值为 &quot;No error&quot;</span><br><span class="line">let message3 = errorMessage ?? &quot;No error&quot; // &quot;Not Found!&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在元祖里面使用可选型"><a href="#在元祖里面使用可选型" class="headerlink" title="在元祖里面使用可选型"></a>在元祖里面使用可选型</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">//errorMessage 设置为可选</span><br><span class="line">var error1:(errorCode:Int, errorMsg:String?) = (404, &quot;Not found!&quot;)</span><br><span class="line"></span><br><span class="line">error1.errorMsg = nil //成功</span><br><span class="line"></span><br><span class="line">print(error1) //打印：(404, nil)</span><br><span class="line"></span><br><span class="line">//把整个元祖设置为可选</span><br><span class="line">var error2:(errorCode:Int, errorMsg:String)? = (404, &quot;Not Found!&quot;)</span><br><span class="line"></span><br><span class="line">error2 = nil //成功的</span><br><span class="line"></span><br><span class="line">print(error2) // 打印：nil</span><br></pre></td></tr></table></figure>
+
+
+<p><a target="_blank" rel="noopener" href="http://makaidong.com/think2me/1/305761_12435222.html">摘自</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Swift/" rel="tag"># Swift</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/04/01/Swift%E4%B8%ADenum%E3%80%81struct%E3%80%81class/" rel="prev" title="Swift中enum、struct、class">
+      <i class="fa fa-chevron-left"></i> Swift中enum、struct、class
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/04/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3KVO%E5%92%8CKVC/" rel="next" title="深入理解KVO和KVC">
+      深入理解KVO和KVC <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E%E4%B8%80%E4%B8%AA%E5%8F%AF%E9%80%89%E9%A1%B9"><span class="nav-number">1.</span> <span class="nav-text">声明一个可选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E8%83%BD%E9%9A%90%E7%A4%BA%E7%9A%84%E5%A3%B0%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">不能隐示的声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E9%80%89%E5%9E%8B%E7%9A%84%E8%A7%A3%E5%8C%85%E3%80%82"><span class="nav-number">3.</span> <span class="nav-text">可选型的解包。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E4%BB%A5%E7%94%A8if-%E5%88%A4%E6%96%AD%E5%8F%AF%E9%80%89%E5%9E%8B%E6%98%AF%E5%90%A6%E4%B8%BAnil%EF%BC%8C%E5%AE%89%E5%85%A8%E5%90%8E%E5%86%8D%E7%94%A8-%E8%A7%A3%E5%8C%85"><span class="nav-number">4.</span> <span class="nav-text">可以用if 判断可选型是否为nil，安全后再用!解包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#if-%E8%81%94%E5%90%88%E4%BD%BF%E7%94%A8-let-%E5%85%B3%E9%94%AE%E5%AD%97%E8%A7%A3%E5%8C%85%EF%BC%8C%E5%8F%AF%E4%BB%A5%E4%B8%8D%E7%94%A8-%E4%BA%86"><span class="nav-number">5.</span> <span class="nav-text">if 联合使用 let 关键字解包，可以不用!了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-if-let-%E8%A7%A3%E5%8C%85%E5%A4%9A%E4%B8%AA%E5%8F%AF%E9%80%89%E5%9E%8B%E7%9A%84%E5%80%BC%E3%80%82%E7%9B%B8%E5%BD%93%E4%BA%8E-and-%E6%93%8D%E4%BD%9C"><span class="nav-number">6.</span> <span class="nav-text">使用 if let 解包多个可选型的值。相当于 and 操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-if-let-%E5%86%8D%E5%8A%A0-where-%E8%BF%9B%E4%B8%80%E6%AD%A5%E9%99%90%E5%AE%9A"><span class="nav-number">7.</span> <span class="nav-text">使用 if let 再加 where 进一步限定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-guard-let%EF%BC%8C%E5%8F%AF%E4%BB%A5%E4%B8%8D%E7%94%A8-%E4%BA%86"><span class="nav-number">8.</span> <span class="nav-text">使用 guard let，可以不用!了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-guard-let-%E8%A7%A3%E5%8C%85%E5%A4%9A%E4%B8%AA%E5%8F%AF%E9%80%89%E5%9E%8B%E7%9A%84%E5%80%BC%E3%80%82%E7%9B%B8%E5%BD%93%E4%BA%8E-and-%E6%93%8D%E4%BD%9C"><span class="nav-number">9.</span> <span class="nav-text">使用 guard let 解包多个可选型的值。相当于 and 操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optional-chaining-%E9%93%BE%E5%BC%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">10.</span> <span class="nav-text">Optional chaining 链式操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-%E8%A7%A3%E5%8C%85%E3%80%82%E6%9B%B4%E5%8A%A0%E5%8D%95%E7%9A%84%E4%B8%89%E7%9B%AE%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="nav-number">11.</span> <span class="nav-text">使用 ?? 解包。更加单的三目运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%85%83%E7%A5%96%E9%87%8C%E9%9D%A2%E4%BD%BF%E7%94%A8%E5%8F%AF%E9%80%89%E5%9E%8B"><span class="nav-number">12.</span> <span class="nav-text">在元祖里面使用可选型</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Marks - 上海</p>
+  <div class="site-description" itemprop="description">小码农的博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Marks - 上海</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

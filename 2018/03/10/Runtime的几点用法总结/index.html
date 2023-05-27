@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="runtime简介 RunTime简称运行时。OC就是运行时机制，也就是在运行时候的一些机制，其中最主要的是消息机制。 对于C语言，函数的调用在编译的时候会决定调用哪个函数。 对于OC的函数，属于动态调用过程，在编译的时候并不能决定真正调用哪个函数，只有在真正运行的时候才会根据函数的名称找到对应的函数来调用。 事实证明： 在编译阶段，OC可以调用任何函数，即使这个函数并未实现，只要声明过就不会报错">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Runtime的几点用法总结">
+<meta property="og:url" content="http://yoursite.com/2018/03/10/Runtime%E7%9A%84%E5%87%A0%E7%82%B9%E7%94%A8%E6%B3%95%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Marks">
+<meta property="og:description" content="runtime简介 RunTime简称运行时。OC就是运行时机制，也就是在运行时候的一些机制，其中最主要的是消息机制。 对于C语言，函数的调用在编译的时候会决定调用哪个函数。 对于OC的函数，属于动态调用过程，在编译的时候并不能决定真正调用哪个函数，只有在真正运行的时候才会根据函数的名称找到对应的函数来调用。 事实证明： 在编译阶段，OC可以调用任何函数，即使这个函数并未实现，只要声明过就不会报错">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/412094-06902bf5c47bb62e.png?imageMogr2/auto-orient/strip%7CimageView2/2">
+<meta property="article:published_time" content="2018-03-10T08:30:56.000Z">
+<meta property="article:modified_time" content="2023-05-27T11:58:43.410Z">
+<meta property="article:author" content="Marks - 上海">
+<meta property="article:tag" content="Objective-C">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/412094-06902bf5c47bb62e.png?imageMogr2/auto-orient/strip%7CimageView2/2">
+
+<link rel="canonical" href="http://yoursite.com/2018/03/10/Runtime%E7%9A%84%E5%87%A0%E7%82%B9%E7%94%A8%E6%B3%95%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Runtime的几点用法总结 | Marks</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Marks" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Marks</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">iOS开发者，喜欢研究技术。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/10/Runtime%E7%9A%84%E5%87%A0%E7%82%B9%E7%94%A8%E6%B3%95%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Marks - 上海">
+      <meta itemprop="description" content="小码农的博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Marks">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Runtime的几点用法总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-03-10 16:30:56" itemprop="dateCreated datePublished" datetime="2018-03-10T16:30:56+08:00">2018-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-27 19:58:43" itemprop="dateModified" datetime="2023-05-27T19:58:43+08:00">2023-05-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="runtime简介"><a href="#runtime简介" class="headerlink" title="runtime简介"></a>runtime简介</h2><ul>
+<li>RunTime简称运行时。OC就是<strong><em>运行时机制</em></strong>，也就是在运行时候的一些机制，其中最主要的是消息机制。</li>
+<li>对于C语言，<strong><em>函数的调用在编译的时候会决定调用哪个函数</em></strong>。</li>
+<li>对于OC的函数，属于<strong><em>动态调用过程</em></strong>，在编译的时候并不能决定真正调用哪个函数，只有在真正运行的时候才会根据函数的名称找到对应的函数来调用。</li>
+<li>事实证明：<ul>
+<li>在编译阶段，OC可以<strong><em>调用任何函数</em></strong>，即使这个函数并未实现，只要声明过就不会报错。</li>
+<li>在编译阶段，C语言调用<strong><em>未实现的函数</em></strong>就会报错。<span id="more"></span>
+
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="给类别Category添加属性"><a href="#给类别Category添加属性" class="headerlink" title="给类别Category添加属性"></a>给类别Category添加属性</h2><p>比如说我们需要在类别中添加一个NSString类型的属性，直接在.h文件添加 <strong>@property(nonatomic,copy) NSString*categoryProperty;</strong> 这时候使用点语法进行调用的话，程序会出现crash错误:<strong><em>Terminating app due to uncaught exception ‘NSInvalidArgumentException’, reason: ‘-[ViewController setCategoryProperty:]: unrecognized selector sent to instance 0x7ff661e43dd0’</em></strong>。这种状况的原因其实很简单，只是没有实现setter和getter方法而已，所以我们的问题就转为实现setter 和 getter方法。<br>一言不合就要上代码了，主要记录两种类型数据的处理方式。例子为给UIImage添加了两个属性，没什么具体含义，主要记录用法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">//.h</span><br><span class="line">#import &lt;UIKit/UIKit.h&gt;</span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line">@interface UIImage (MNZAdd)</span><br><span class="line">	</span><br><span class="line">@property(nonatomic,strong) NSString *name;</span><br><span class="line">@property(nonatomic,assign) CGFloat add;</span><br><span class="line">	</span><br><span class="line">@end</span><br><span class="line">	</span><br><span class="line">NS_ASSUME_NONNULL_END</span><br><span class="line">	</span><br><span class="line">//.m</span><br><span class="line">#import &quot;UIImage+ MNZAdd.h&quot;</span><br><span class="line">#import &lt;objc/runtime.h&gt;</span><br><span class="line">	</span><br><span class="line">@implementation UIImage (MNZAdd)</span><br><span class="line">#pragma mark - 添加属性</span><br><span class="line">	</span><br><span class="line">- (void)setName:(NSString *)name</span><br><span class="line">&#123;</span><br><span class="line">    [self willChangeValueForKey:NSStringFromSelector(@selector(name))];</span><br><span class="line">    objc_setAssociatedObject(self, _cmd, name, OBJC_ASSOCIATION_COPY);</span><br><span class="line">    [self didChangeValueForKey:NSStringFromSelector(@selector(name))];</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (NSString *)name</span><br><span class="line">&#123;</span><br><span class="line">    return objc_getAssociatedObject(self, @selector(setName:));</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (void)setAdd:(CGFloat)add</span><br><span class="line">&#123;</span><br><span class="line">    [self willChangeValueForKey:NSStringFromSelector(@selector(add))];</span><br><span class="line">	</span><br><span class="line">    //区别在这里，区别在这里</span><br><span class="line">    NSValue *value = [NSValue value:&amp;add withObjCType:@encode(CGFloat)];</span><br><span class="line">    objc_setAssociatedObject(self, _cmd, value, OBJC_ASSOCIATION_RETAIN);</span><br><span class="line">	</span><br><span class="line">    [self didChangeValueForKey:NSStringFromSelector(@selector(add))];</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (CGFloat)add</span><br><span class="line">&#123;</span><br><span class="line">    CGFloat cValue = &#123;0&#125;;</span><br><span class="line">    NSValue *value = objc_getAssociatedObject(self, @selector(setAdd:));</span><br><span class="line">    [value getValue:&amp;cValue];</span><br><span class="line">    return cValue;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<h2 id="利用runtime来替换已有的系统方法"><a href="#利用runtime来替换已有的系统方法" class="headerlink" title="利用runtime来替换已有的系统方法"></a>利用runtime来替换已有的系统方法</h2><p>例子，初始化UIImage的时候，在不同的系统版本中添加不同的风格的切图，怎么就是和UIImage过不去了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">//.h</span><br><span class="line">#import &lt;UIKit/UIKit.h&gt;</span><br><span class="line">	</span><br><span class="line">@interface UIImage (MNZAdd)</span><br><span class="line">/*!</span><br><span class="line"> @brief 如果调用这个，其实调用的是原来系统的方法，因为他两交换了实现</span><br><span class="line">	</span><br><span class="line"> @note 为防止误用，可以不声明该方法</span><br><span class="line"> */</span><br><span class="line">+ (nonnull UIImage *)mnz_imageNamed:(NSString *)name;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">//.m</span><br><span class="line">#import &quot;UIImage+MNZAdd.h&quot;</span><br><span class="line">#import &lt;objc/runtime.h&gt;</span><br><span class="line">	</span><br><span class="line">@implementation UIImage (MNZAdd)</span><br><span class="line">	</span><br><span class="line">+ (void)load &#123;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        Class class = [self class];</span><br><span class="line">        </span><br><span class="line">        SEL originalSelector = @selector(imageNamed:);</span><br><span class="line">        SEL mySelector = @selector(mnz_imageNamed:);</span><br><span class="line">        /*</span><br><span class="line">            //实例方法</span><br><span class="line">            Method originalMethod = class_getInstanceMethod(class, originalSelector);</span><br><span class="line">            Method myMethod = class_getInstanceMethod(class, mySelector);</span><br><span class="line">         */</span><br><span class="line">        Method originalMethod = class_getClassMethod(class, originalSelector);</span><br><span class="line">        Method myMethod = class_getClassMethod(class, mySelector);</span><br><span class="line">        </span><br><span class="line">        class_addMethod(class, originalSelector, class_getMethodImplementation(class, originalSelector), method_getTypeEncoding(originalMethod));</span><br><span class="line">        class_addMethod(class, mySelector, class_getMethodImplementation(class, mySelector), method_getTypeEncoding(myMethod));</span><br><span class="line">        //交换方法的实现</span><br><span class="line">        method_exchangeImplementations(originalMethod, myMethod);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">#pragma mark - 交换系统方法</span><br><span class="line">+ (nonnull UIImage *)mnz_imageNamed:(NSString *)name &#123;</span><br><span class="line">    /*!</span><br><span class="line">     在这里实现我们所需要做的操作</span><br><span class="line">     */</span><br><span class="line">    double systemVersion = [[[UIDevice currentDevice]systemVersion] floatValue];</span><br><span class="line">    if (systemVersion &gt;= 9.0) &#123;</span><br><span class="line">        name = [name stringByAppendingString:@&quot;_os&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    //这个地方很关键，mnz_imageNamed:是调用系统的imageNamed:实现(两个方法交换了实现)</span><br><span class="line">    UIImage *image = [UIImage mnz_imageNamed:name];</span><br><span class="line">    return image;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法+ (void)load不是这里的重点，简单知道一下：一般情况下，类别中的方法会重写掉主类里面相同命名的方法，但+load:是个特例，当一个类被读到内存的时候，runtime会给这个类以及他的每一个类别都发送一个 +load:消息(知道这一点很重要)。<br><strong>Note：注意交换方法只能执行一次，不要总是执行，load的意义在这儿也有体现的。</strong></p>
+<p>还有一点是，尝试添加原 selector 是为了做一层保护，因为如果这个类没有实现 originalSelector ，但是其父类实现了，那么 class_getInstanceMethod 返回的将是父类的方法。这样就导致了 method_exchangeImplementations 替换的是父类的方法。所以先尝试添加 originalSelector ，如果已经存在，再用 method_exchangeImplementations 把原来的方法的实现交换成新方法的实现。</p>
+<h2 id="实现自动归档和自动解档"><a href="#实现自动归档和自动解档" class="headerlink" title="实现自动归档和自动解档"></a>实现自动归档和自动解档</h2><p>其实归档的实现很简单，只不过就是实现协议<NSCoding>，需要说明一点的是： <strong>实现了 ‘NSCoding’协议，就可以支持数据类和数据流间的编码和解码，而数据流可以持久化到硬盘。</strong></NSCoding></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">//.h</span><br><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">	</span><br><span class="line">@interface MNZEncodeModel : NSObject&lt;NSCoding&gt;</span><br><span class="line">	</span><br><span class="line">@property(nonatomic,strong) NSString *name;</span><br><span class="line">@property(nonatomic,assign) int age;</span><br><span class="line">@property(nonatomic,assign) NSRange range;</span><br><span class="line">	</span><br><span class="line">@end</span><br><span class="line">	</span><br><span class="line">//.m</span><br><span class="line">#import &quot;MNZEncodeModel.h&quot;</span><br><span class="line">#import &quot;NSObject+MNZEncode.h&quot;</span><br><span class="line">	</span><br><span class="line">NSString *const kEncodeName = @&quot;name&quot;;</span><br><span class="line">NSString *const kEncodeAge = @&quot;age&quot;;</span><br><span class="line">NSString *const kEncodeRange = @&quot;range&quot;;</span><br><span class="line">	</span><br><span class="line">@implementation MNZEncodeModel</span><br><span class="line">	</span><br><span class="line">- (instancetype)initWithCoder:(NSCoder *)aDecoder</span><br><span class="line">&#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    if (self) &#123;</span><br><span class="line">        _name = [aDecoder decodeObjectForKey:kEncodeName];</span><br><span class="line">        _age = [aDecoder decodeIntForKey:kEncodeAge];</span><br><span class="line">        _range = [[aDecoder decodeObjectForKey:kEncodeRange] rangeValue];</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (void)encodeWithCoder:(NSCoder *)aCoder</span><br><span class="line">&#123;</span><br><span class="line">    [aCoder encodeObject:self.name forKey:kEncodeName];</span><br><span class="line">    [aCoder encodeInt:self.age forKey:kEncodeAge];</span><br><span class="line">    [aCoder encodeObject:[NSValue valueWithRange:self.range] forKey:kEncodeRange];</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>可问题在于，像这样只有三个属性需要我们，可以这样写，那如果有三十个属性呐，身为一个会偷懒的程序员自然要找偷懒的方法了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">//.h</span><br><span class="line">	</span><br><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">	</span><br><span class="line">@interface MNZEncodeModel : NSObject &lt;NSCoding&gt;</span><br><span class="line">	</span><br><span class="line">@property(nonatomic,strong) NSString *name;</span><br><span class="line">@property(nonatomic,assign) int age;</span><br><span class="line">@property(nonatomic,assign) NSRange range;</span><br><span class="line">	</span><br><span class="line">@end</span><br><span class="line">	</span><br><span class="line">//.m</span><br><span class="line">#import &quot;MNZEncodeModel.h&quot;</span><br><span class="line">#import &lt;objc/runtime.h&gt;</span><br><span class="line">	</span><br><span class="line">@implementation MNZEncodeModel</span><br><span class="line"></span><br><span class="line">- (instancetype)initWithCoder:(NSCoder *)coder</span><br><span class="line">&#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    if (self) &#123;</span><br><span class="line">        unsigned int count = 0;</span><br><span class="line">        Ivar *ivars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">        for (int i=0; i&lt;count; i++) &#123;</span><br><span class="line">            Ivar ivar = ivars[i];</span><br><span class="line">            const char *name = ivar_getName(ivar);</span><br><span class="line">            NSString *key = [NSString stringWithUTF8String:name];</span><br><span class="line">            id value = [coder decodeObjectForKey:key];</span><br><span class="line">            [self setValue:value forKey:key];</span><br><span class="line">        &#125;</span><br><span class="line">        free(ivars);</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (void)encodeWithCoder:(NSCoder *)aCoder &#123;</span><br><span class="line">    unsigned int count = 0;</span><br><span class="line">    Ivar *ivars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">    for (int i=0; i&lt;count; i++) &#123;</span><br><span class="line">        Ivar ivar = ivars[i];</span><br><span class="line">        const char *name = ivar_getName(ivar);</span><br><span class="line">        NSString *key = [NSString stringWithUTF8String:name];</span><br><span class="line">        id value = [self valueForKey:key];</span><br><span class="line">        [aCoder encodeObject:value forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    free(ivars);</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p><strong>简化一下使用方式</strong></p>
+<p>而这样每一个模型类都要写着无聊的代码，而大部分类都是继承自NSObject，所以，我们可以实现一个NSObject类别来专门做这件事。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">//.h</span><br><span class="line">	</span><br><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">	</span><br><span class="line">@interface NSObject (MNZEncode)</span><br><span class="line">	</span><br><span class="line">- (instancetype)mnz_initWithCoder:(NSCoder *)aDecoder;</span><br><span class="line">- (void)mnz_encodeWithCoder:(NSCoder *)aCoder;</span><br><span class="line">	</span><br><span class="line">@end</span><br><span class="line">	</span><br><span class="line">//.m</span><br><span class="line">	</span><br><span class="line">#import &quot;NSObject+MNZEncode.h&quot;</span><br><span class="line">#import &lt;objc/runtime.h&gt;</span><br><span class="line">	</span><br><span class="line">@implementation NSObject (MNZEncode)</span><br><span class="line">	</span><br><span class="line">- (instancetype)mnz_initWithCoder:(NSCoder *)aDecoder</span><br><span class="line">&#123;</span><br><span class="line">    if (!aDecoder) return self;</span><br><span class="line">    if (self == (id)kCFNull) return self;</span><br><span class="line">    unsigned int count = 0;</span><br><span class="line">    Ivar *ivars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">    for (int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        //取出i对应位置的成员变量</span><br><span class="line">        Ivar ivar = ivars[i];</span><br><span class="line">        //查看成员变量</span><br><span class="line">        const char *name = ivar_getName(ivar);</span><br><span class="line">        //归档</span><br><span class="line">        NSString *key = [NSString stringWithUTF8String:name];</span><br><span class="line">        id value = [aDecoder decodeObjectForKey:key];</span><br><span class="line">        //设置到成员变量身上</span><br><span class="line">        [self setValue:value forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    free(ivars);</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (void)mnz_encodeWithCoder:(NSCoder *)aCoder</span><br><span class="line">&#123;</span><br><span class="line">    if (!aCoder) return;</span><br><span class="line">    if (self == (id)kCFNull) &#123;</span><br><span class="line">        [((id&lt;NSCoding&gt;)self)encodeWithCoder:aCoder];</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    unsigned int count = 0;</span><br><span class="line">    Ivar *ivars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">	</span><br><span class="line">    for (int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Ivar ivar = ivars[i];</span><br><span class="line">        const char *name = ivar_getName(ivar);</span><br><span class="line">        NSString *key = [NSString stringWithUTF8String:name];</span><br><span class="line">        id value = [self valueForKey:key];</span><br><span class="line">        [aCoder encodeObject:value forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    free(ivars);</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<p>这样在使用的时候只需要简单的引用一下就可以了</p>
+<h2 id="消息转发"><a href="#消息转发" class="headerlink" title="消息转发"></a>消息转发</h2><p><strong>objc_msgSend</strong>方法的使用</p>
+<pre><code>objc_msgSend(receiver,selector)</code></pre><p>或者传入参数</p>
+<pre><code>objc_msgSend(receiver,selector,arg1,arg2,...)</code></pre><p>对于一个给定的函数调用，如</p>
+<pre><code>[self SendImage:fileName];</code></pre><p>可以通过如下方法来替换：</p>
+<pre><code>void (*action)(id, SEL, NSString*) = (void (*)(id, SEL, NSString*))objc_msgSend;
+action(self, @selector(SendImage:), fileName);</code></pre><p>注意objc_msgSend函数总是以一个id变量和一个selector作为它的前两个参数。objc_msgSend 被转换成函数指针后，就可以通过这个函数指针进行函数调用了。</p>
+<p>当一个message被发送给object，会根据object的isa 指针找到类结构里的方法，如果不能找到，一直顺着父类寻找该方法的实现，直到NSObject类。</p>
+<p>为加快速度，runtime system 会缓存使用过的selector和方法地址。 </p>
+<ul>
+<li>通过object的isa指针找到他的class</li>
+<li>在class的method_list中找到方法</li>
+<li>如果class中没有找到方法，继续往superclass中查找</li>
+<li>一旦找到这个函数，执行对应的方法实现 （IMP）</li>
+<li>找不到 Dynamic Method Resolution(动态方法决议) 如果是实例方法，调用<strong>+ (BOOL)resolveInstanceMethod:(SEL)sel,</strong>如果是类方法，调用<strong>+ (BOOL)resolveClassMethod:(SEL)sel，</strong>这样可以让程序在运行时动态的为一个selector提供实现。如果返回YES，运行时系统会重启一次消息的发送过程，调动动态添加方法。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">+(BOOL)resolveInstanceMethod:(SEL)sel</span><br><span class="line">&#123;</span><br><span class="line">  if (sel == @selector(foo)) &#123;</span><br><span class="line">      class_addMethod([self class], sel, (IMP)dynamicMethodIMP, &quot;V@:&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  return [super resolveInstanceMethod:sel];</span><br><span class="line">&#125;</span><br><span class="line">void dynamicMethodIMP(id self,SEL _cmd)&#123;</span><br><span class="line">  NSLog(@&quot;%s&quot;,__PRETTY_FUNCTION__);</span><br><span class="line">&#125;</span><br><span class="line">+(BOOL)resolveClassMethod:(SEL)sel</span><br><span class="line">&#123;</span><br><span class="line">  return [super resolveClassMethod:sel];</span><br><span class="line">&#125;]</span><br></pre></td></tr></table></figure>
+
+<p><strong>Note：Objective-C的方法本质上是一个至少包含了两个参数（id self,SEL _cmd)的C函数。</strong></p>
+<h3 id="Message-Forwarding（消息转发）"><a href="#Message-Forwarding（消息转发）" class="headerlink" title="Message Forwarding（消息转发）"></a>Message Forwarding（消息转发）</h3><p>分两步：<br>1、首先运行时系统会调用- (id)forwardingTargetForSelector:(SEL)aSelector方法，如果这个方法中返回的不是nil或者self，运行时系统将把消息发送给返回的那个对象<br>2、如果- (id)forwardingTargetForSelector:(SEL)aSelector返回的是nil或者self，运行时系统首先会调用- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector方法来获得方法签名，方法签名记录了方法的参数和返回值的信息，如果－methodSignatureForSelector 返回的是nil, 运行时系统会抛出unrecognized selector exception，程序到这里就结束了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector</span><br><span class="line">&#123;</span><br><span class="line">  NSMethodSignature *signature =[super methodSignatureForSelector:aSelector];</span><br><span class="line">  if (!signature) &#123;</span><br><span class="line">      //获取指定对象的方法签名</span><br><span class="line">      signature = [target methodSignatureForSelector:aSelector];</span><br><span class="line">  &#125;</span><br><span class="line">	</span><br><span class="line">  return signature;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (void)forwardInvocation:(NSInvocation *)anInvocation</span><br><span class="line">&#123;</span><br><span class="line">  //检测target是否实现来该方法</span><br><span class="line">  if ([target respondsToSelector:anInvocation.selector]) &#123;</span><br><span class="line">      //如果实现了，在这儿将方法分发到对象中去 。可利用这个实现多重代理</span><br><span class="line">      [anInvocation invokeWithTarget:target];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">- (id)forwardingTargetForSelector:(SEL)aSelector</span><br><span class="line">&#123;</span><br><span class="line">  return nil;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">// 第一步：我们不动态添加方法，返回NO，进入第二步；</span><br><span class="line">+ (BOOL)resolveInstanceMethod:(SEL)sel</span><br><span class="line">&#123;</span><br><span class="line">    return NO;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">// 第二部：我们不指定备选对象响应aSelector，进入第三步；</span><br><span class="line">- (id)forwardingTargetForSelector:(SEL)aSelector</span><br><span class="line">&#123;</span><br><span class="line">    return nil;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">// 第三步：返回方法选择器，然后进入第四部；</span><br><span class="line">- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector </span><br><span class="line">&#123;</span><br><span class="line">    if ([NSStringFromSelector(aSelector) isEqualToString:@&quot;sing&quot;]) &#123;</span><br><span class="line">        return [NSMethodSignature signatureWithObjCTypes:&quot;v@:&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    return [super methodSignatureForSelector:aSelector];</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">// 第四部：这步我们修改调用对象</span><br><span class="line">- (void)forwardInvocation:(NSInvocation *)anInvocation </span><br><span class="line">&#123;</span><br><span class="line">    // 我们改变调用对象为People</span><br><span class="line">    NewClass *newTarget = [[NewClass alloc] init];</span><br><span class="line">    [anInvocation invokeWithTarget:newTarget];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>流程图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/412094-06902bf5c47bb62e.png?imageMogr2/auto-orient/strip%7CimageView2/2" alt="流程图"></p>
+<h2 id="几个特殊方法"><a href="#几个特殊方法" class="headerlink" title="几个特殊方法"></a>几个特殊方法</h2><p><strong>objc_msgSend_stret</strong><br>如果待发送的消息要返回结构体，那么可交由此函数处理。只有当CPU的寄存器能够容纳得下消息返回类型时，这个函数才能处理此消息。若是返回值无法容纳于CPU寄存器中（比如说返回的结构体太大了），那么就由另一个函数执行派发。此时，那个函数会通过分配在栈上的某个变量来处理消息所返回的结构体。</p>
+<p><strong>objc_msgSend_fpret</strong><br>如果消息返回的是浮点数，那么可交由此函数处理。在某些架构的CPU中调用函数时，需要对“浮点数寄存器”（floating-point register）做特殊处理，也就是说，通常所用的objc_msgSend在这种情况下并不合适。这个函数是为了处理x86等架构CPU中某些令人稍觉惊讶的奇怪状况。</p>
+<p><strong>objc_msgSendSuper</strong><br>如果要给超类发消息，例如[super message:parameter]，那么就交由此函数处理。也有另外两个与objc_msgSend_stret和objc_msgSend_fpret等效的函数，用于处理发给super的相应消息。</p>
+<p>上文说过，当找到相应的方法时，会跳转过去。之所以可以这样实现，是因为每一个Objective-C函数都可以看作是一个简单的C函数，原型如下：</p>
+<pre><code>&lt;return_type&gt; Class_selector(id self,SEL _cmd,...)</code></pre><p>以上Class及selector的命名是为了方便理解。每个类中都有一张类似于字典的方法表，而selector就相当于查找方法的key，objc_msgSend函数就是通过查这张表来实现跳转的。之所以以上原型和objc_msgSend方法长的非常相像，是为了更好使用tail-call技术来时方法的跳转更加优化。</p>
+<p>如果某函数的最后一项操作是调用另外一个函数，那么就可以运用“tail-call”技术。<br>此时编译器会生成调转至另一函数所需的指令码，而不会向调用堆栈中推入新的“栈帧”。tail-call使用的条件比较苛刻，除了要求函数的最后一项操作是调用另外一个函数外，，并且要求另外一个函数不是有返回值的函数类型。tail-call对objc_msgSend非常关键，如果不这么做的话，那么每次调用Objective-C方法之前，都需要为调用objc_msgSend函数准备“栈帧”，若是不优化，还会过早地发生“栈溢出”（stack overflow）现象。</p>
+<p>在写OC中，我们其实并不需要了解那么多底层的东西，但是我们需要知道调用一个方法之后，OC底层都发生了什么。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><blockquote>
+<p>1、一个消息包含接受者，选择子和参数。调用一个方法相当于像对象发送一条消息。<br>2、当发送消息是，动态绑定机制会帮助我们查找方法的实现并进行运行。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Objective-C/" rel="tag"># Objective-C</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/03/GCD/" rel="prev" title="GCD-semaphore">
+      <i class="fa fa-chevron-left"></i> GCD-semaphore
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/03/22/URL%E8%BD%AC%E4%B9%89/" rel="next" title="URL转义">
+      URL转义 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#runtime%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">runtime简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%99%E7%B1%BB%E5%88%ABCategory%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">给类别Category添加属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8runtime%E6%9D%A5%E6%9B%BF%E6%8D%A2%E5%B7%B2%E6%9C%89%E7%9A%84%E7%B3%BB%E7%BB%9F%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">利用runtime来替换已有的系统方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%BD%92%E6%A1%A3%E5%92%8C%E8%87%AA%E5%8A%A8%E8%A7%A3%E6%A1%A3"><span class="nav-number">4.</span> <span class="nav-text">实现自动归档和自动解档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91"><span class="nav-number">5.</span> <span class="nav-text">消息转发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Message-Forwarding%EF%BC%88%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">Message Forwarding（消息转发）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E7%89%B9%E6%AE%8A%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">几个特殊方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Marks - 上海</p>
+  <div class="site-description" itemprop="description">小码农的博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Marks - 上海</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
